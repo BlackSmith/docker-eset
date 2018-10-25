@@ -1,0 +1,54 @@
+# Use root/example as user/password credentials
+version: '3.1'
+
+services:
+
+  db:
+    image: mysql:5.7
+    command: "--default-authentication-plugin=mysql_native_password --innodb-log-file-size=100M --innodb-log-files-in-group=2 --max-allowed-packet=30M --bind-address=*"
+    restart: always
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_USER=$DB_ADMIN_USERNAME
+      - MYSQL_ROOT_PASSWORD=$DB_ADMIN_PASSWORD
+    volumes:
+      - "${ROOT}/mysql/data:/var/lib/mysql"
+    logging:
+      driver: journald
+
+  server:
+    image: era-server:latest
+    build:
+     context: docker-eset-era-server/
+    image: era-server:latest
+    restart: always
+    env_file: .env
+    environment:
+      - DB_HOSTNAME=db
+    depends_on:
+      - db
+    ports:
+      - 2222:2222
+    volumes:
+      - "${ROOT}/etc:/etc/opt/eset/"
+      - "${ROOT}/var:/var/opt/eset/"
+      - "${ROOT}/log:/var/log/eset/"
+    logging:
+      driver: journald
+
+  console:
+    image: era-console:latest
+    build:
+     context: docker-eset-era-console/
+    image: era-console:latest
+    restart: always
+    env_file: .env
+    environment:
+      - ERA_SRV_HOSTNAME=server
+    depends_on:
+      - server
+   ports:
+     - 8080:8080
+    logging:
+      driver: journald
+
