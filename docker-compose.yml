@@ -1,11 +1,9 @@
 # Use root/example as user/password credentials
 version: '3.1'
-
 services:
-
   db:
     image: mysql:5.7
-    command: "--default-authentication-plugin=mysql_native_password --innodb-log-file-size=100M --innodb-log-files-in-group=2 --max-allowed-packet=30M --bind-address=*"
+    command: --default-authentication-plugin=mysql_native_password --innodb-log-file-size=100M --innodb-log-files-in-group=2 --max-allowed-packet=30M --bind-address=*
     restart: always
     env_file: .env
     environment:
@@ -19,7 +17,7 @@ services:
   server:
     image: era-server:latest
     build:
-     context: docker-eset-era-server/
+      context: docker-eset-era-server/
     image: era-server:latest
     restart: always
     env_file: .env
@@ -39,7 +37,7 @@ services:
   console:
     image: era-console:latest
     build:
-     context: docker-eset-era-console/
+      context: docker-eset-era-console/
     image: era-console:latest
     restart: always
     env_file: .env
@@ -47,8 +45,7 @@ services:
       - ERA_SRV_HOSTNAME=server
     depends_on:
       - server
-   ports:
+    ports:
      - 8080:8080
     logging:
       driver: journald
-
